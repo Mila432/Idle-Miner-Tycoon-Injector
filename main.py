@@ -66,13 +66,21 @@ class API(object):
 		save='{"SavegameId":"%s","DeviceId":"%s","SavegameVersion":%s,"AppVersion":"%s","Savegame":"%s","NetWorth":%s}'%(self.SavegameId,self.DeviceId,self.SavegameVersion,self.AppVersion,self.Savegame,self.NetWorth)
 		return self.callAPI({"Data":{"Savegame":save},"KeysToRemove":None,"Permission":None})
 
+	def haveSavegame(self):
+		if not hasattr(self,'Savegame'):
+			self.log('! could not load savegame..')
+			exit(1)
+		return True
+
 	def addSkill(self,cnt):
+		self.haveSavegame()
 		for idx,s in enumerate(self.Savegame['Data']['Resources']['WorldSkillpoints']):
 			self.Savegame['Data']['Resources']['WorldSkillpoints'][idx]=self.Savegame['Data']['Resources']['WorldSkillpoints'][idx]+cnt
 		self.Savegame=self.CompressString(json.dumps(self.Savegame,separators=(',', ':')))
 		self.UpdateUserData()
 
 	def addSuperCash(self,cnt):
+		self.haveSavegame()
 		self.log('cash:%s'%(self.Savegame['Data']['Resources']['SuperCash']))
 		self.Savegame['Data']['Resources']['SuperCash']=float(self.Savegame['Data']['Resources']['SuperCash']+cnt)
 		self.log('cash:%s'%(self.Savegame['Data']['Resources']['SuperCash']))
@@ -80,6 +88,7 @@ class API(object):
 		self.UpdateUserData()
 
 	def addChests(self,cnt):
+		self.haveSavegame()
 		print self.Savegame['Data']['Chests']
 		for idx,c in enumerate(self.Savegame['Data']['Chests']):
 			self.Savegame['Data']['Chests'][idx]['Amount']+=cnt
